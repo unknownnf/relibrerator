@@ -1,0 +1,6 @@
+[submodule "koreader-base"]
+	path = koreader-base
+	url = git://github.com/koreader/koreader-base.git
+[submodule "koreader-misc"]
+    path = koreader-misc
+    url = git://github.com/koreader/koreader-misc.git
