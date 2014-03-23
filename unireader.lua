@@ -947,7 +947,34 @@ end
 function UniReader:saveSpecialSettings()
 end
 
+-- save settings
+function UniReader:saveSettings()
+    if self.settings ~= nil then
+		self:saveLastPageOrPos()
+		self.settings:saveSetting("jump_history", self.jump_history)
+		self.settings:saveSetting("bookmarks", self.bookmarks)
+		self.settings:saveSetting("highlight", self.highlight)
+		-- other parameters are reader-specific --> @TODO: move to a proper place, like saveSpecialSettings()
+		self.settings:saveSetting("gamma", self.globalgamma)
+		self.settings:saveSetting("bbox", self.bbox)
+		self.settings:saveSetting("globalzoom", self.globalzoom)
+		self.settings:saveSetting("globalzoom_mode", self.globalzoom_mode)
+		self.settings:saveSetting("render_mode", self.render_mode)	-- djvu-related only
+		-- the following is added to be able to open documents "as you left them"
+		self.settings:saveSetting("offset_x", self.offset_x)
+		self.settings:saveSetting("offset_y", self.offset_y)
+		self.settings:saveSetting("cur_rotation_mode", Screen.cur_rotation_mode)
 
+		--[[ the following parameters were already stored when user changed defaults
+		self.settings:saveSetting("shift_x", self.shift_x)
+		self.settings:saveSetting("shift_y", self.shift_y)
+		self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
+		self.settings:saveSetting("rcountmax", self.rcountmax)
+		]]
+		self:saveSpecialSettings()
+		self.settings:close()
+	end
+end
 
 --[ following are default methods ]--
 
@@ -2531,6 +2558,7 @@ function UniReader:inputLoop()
 				ret_code = command.func(self,keydef)
 				if ret_code == "break" then
 					if keep_running then break end
+                    self:saveSettings()
 					return "break"
 				end
 			else
@@ -2554,32 +2582,8 @@ function UniReader:inputLoop()
 --		self.globalzoom_mode = self.ZOOM_FIT_TO_CONTENT_WIDTH
 --	elseif self.pan_by_page then
 --		self.globalzoom_mode = self.pan_by_page	
---	end	
-	if self.settings ~= nil then
-		self:saveLastPageOrPos()
-		self.settings:saveSetting("jump_history", self.jump_history)
-		self.settings:saveSetting("bookmarks", self.bookmarks)
-		self.settings:saveSetting("highlight", self.highlight)
-		-- other parameters are reader-specific --> @TODO: move to a proper place, like saveSpecialSettings()
-		self.settings:saveSetting("gamma", self.globalgamma)
-		self.settings:saveSetting("bbox", self.bbox)
-		self.settings:saveSetting("globalzoom", self.globalzoom)
-		self.settings:saveSetting("globalzoom_mode", self.globalzoom_mode)
-		self.settings:saveSetting("render_mode", self.render_mode)	-- djvu-related only
-		-- the following is added to be able to open documents "as you left them"
-		self.settings:saveSetting("offset_x", self.offset_x)
-		self.settings:saveSetting("offset_y", self.offset_y)
-		self.settings:saveSetting("cur_rotation_mode", Screen.cur_rotation_mode)
-		
-		--[[ the following parameters were already stored when user changed defaults
-		self.settings:saveSetting("shift_x", self.shift_x)
-		self.settings:saveSetting("shift_y", self.shift_y)
-		self.settings:saveSetting("step_manual_zoom", self.step_manual_zoom)
-		self.settings:saveSetting("rcountmax", self.rcountmax)
-		]]
-		self:saveSpecialSettings()
-		self.settings:close()
-	end
+--	end
+    self:saveSettings()
 
 	-- do clean up stuff
 	self:clearCache()
